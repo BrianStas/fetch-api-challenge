@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { getBreedList } from './utils/api';
 import ReactSelect from 'react-select';
 import Gallery from './Gallery';
@@ -7,9 +7,13 @@ function Home() {
   
     const [breeds, setBreeds] = useState([]);
     const [selection, setSelection] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isGalleryVisible, setIsGalleryVisible] = useState(false);
+    const galleryRef = useRef(null);
 
     useEffect(() => {getBreedList()
-        .then(data => setBreeds(data))
+        .then(data => setBreeds(data));
+        setLoading(false);
     console.log("breeds are: ", breeds)}
     ,[])
 
@@ -33,9 +37,16 @@ function Home() {
 
     console.log("breedList is now: ", breedList)
 
+    const clickHandler = () =>{
+      setIsGalleryVisible(true);
+      setTimeout(()=>{
+        galleryRef.current.scrollIntoView({behavior: "smooth"});
+      }, 200)
+      
+    }
     
   
-    return (
+    return ( loading ? <p>loading...</p> :
         <div>
             <div className="hero min-h-screen" style={{backgroundImage: 'url(https://www.fenzidogsportsacademy.com/images/easyblog_articles/345/b2ap3_large_Sporting-Dogs-Grid.jpeg)'}}>
                 <div className="hero-overlay bg-opacity-60"></div>
@@ -49,11 +60,13 @@ function Home() {
                         name="breedSelections"
                         onChange={(choice) =>{console.log("new choice: ", choice); setSelection(choice)}}
                         />
-                    <button className="btn btn-primary mt-5">View Pics!</button>
+                    <button className="btn btn-primary mt-5" onClick={clickHandler}>View Pics!</button>
                     </div>
                 </div>
             </div>
-            {selection.length ? <Gallery choices={selection} /> : null}
+            <div ref={galleryRef}>
+              {isGalleryVisible ? <Gallery choices={selection} /> : null}
+            </div>
         </div>
   )
 }
