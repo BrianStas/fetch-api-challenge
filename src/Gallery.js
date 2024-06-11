@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { getBreedImages } from './utils/api';
+import DogPopUp from './DogPopUp';
+import DogDisplay from './DogDisplay';
 
 
 function Gallery({choices}) {
@@ -8,6 +10,7 @@ function Gallery({choices}) {
   const [images, setImages] = useState([]);
   const [displayImages, setDisplayImages] = useState([]);
   const [loading, setLoading]= useState(true);
+  
 
     useEffect(()=>{
       setImages(initialImages);
@@ -39,7 +42,7 @@ function Gallery({choices}) {
 
     useEffect(()=>{
       if(images.length>0){
-        setDisplayImages(getRandomImages(images, 20));
+        setDisplayImages(getRandomImages(images, 16));
         setLoading(false);
       }
     }, [images])
@@ -49,9 +52,17 @@ function Gallery({choices}) {
       return shuffled.slice(0, num);
     };
 
-  return ( loading ? <p>loading...</p> : <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 min-w-full">
-    {displayImages && displayImages.map((image, index) => <div key={index} className="w-full h-48 rounded overflow-hidden">
-      <img src={image} alt="dog" className="w-full h-full object-contain" /></div>)}
+    const reshuffleImages = () =>{
+      setDisplayImages(getRandomImages(images, 16));
+    }
+
+  return ( loading ? <p>loading...</p> : <div>
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 min-w-full">
+    {displayImages && displayImages.map((image, index) => <DogDisplay image={image} index={index} />)}
+    </div>
+    <div className="flex justify-center my-4">
+      <button className="btn btn-primary max-w-md" onClick={reshuffleImages}>Reshuffle!</button>
+    </div>
     </div>
   )
 }
